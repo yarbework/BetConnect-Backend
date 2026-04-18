@@ -1,8 +1,8 @@
 import User from '../models/User.model.js';
 import generateToken from '../utils/generateToken.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 
-export const register = async (req, res) => {
-    try{
+export const register = asyncHandler(async (req, res) => {
 
         const {name, email, phone, password, role, personalAddress} = req.body;
         
@@ -43,15 +43,11 @@ export const register = async (req, res) => {
             });
         }
 
-    }catch(error){
-        res.status(500).json({message: error.message});
-    }
-};
+    });
 
-export const login = async (req, res) => {
-    try{
-        const {email, password} = req.body;
-        
+export const login = asyncHandler(async (req, res) => {
+    const {email, password} = req.body;
+    
         const user = await User.findOne({email});
         if(user && (await user.matchPassword(password))){
             res.json({
@@ -65,7 +61,4 @@ export const login = async (req, res) => {
         }else {
             res.status(401).json({message: 'Invalid email or Passowrd'});
         }
-    }catch (error){
-        res.status(500).json({message: error.message})
-    }
-};
+    });
