@@ -7,7 +7,7 @@ export const register = asyncHandler(async (req, res) => {
         const {name, email, phone, password, role, personalAddress} = req.body;
         
         if(!name || !email || !phone || !password || !role || !personalAddress){
-            console.log("Please insert all the required fields")
+            return res.status(400).json({ message: "Please insert all the required fields" });
         }
         const userExists = await User.findOne({email}); 
         if(userExists){
