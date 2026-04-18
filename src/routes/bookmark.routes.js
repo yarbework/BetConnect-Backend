@@ -9,8 +9,8 @@ import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/:propertyId", protect, addBookmark);
 router.get("/", protect, getBookmarks);
+router.post("/:propertyId", protect, addBookmark);
 router.delete("/:propertyId", protect, removeBookmark);
 
 export default router;

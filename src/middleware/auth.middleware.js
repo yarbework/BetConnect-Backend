@@ -52,6 +52,9 @@ export const approvedAgent = (req, res, next) => {
     res.status(403).json({ message: 'Not authorized Agent' });
   }
 };
+
+export const optionalAuth = async (req, res, next) => {
+
     const authHeader = req.headers.authorization;
 
     if (!authHeader?.startsWith('Bearer ')) {
