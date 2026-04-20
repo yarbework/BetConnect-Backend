@@ -11,8 +11,53 @@ import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/:propertyId", protect, bookmarkParamValidator, validate, addBookmark);
-router.get("/", protect, getBookmarks);
-router.delete("/:propertyId", protect, bookmarkParamValidator, validate, removeBookmark);
+/**
+ * @openapi
+ * /bookmarks/{propertyId}:
+ *   post:
+ *     summary: Add bookmark (protected)
+ *     parameters:
+ *       - in: path
+ *         name: propertyId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Bookmark added
+ */
+router.post('/:propertyId', protect, bookmarkParamValidator, validate, addBookmark);
+/**
+ * @openapi
+ * /bookmarks:
+ *   get:
+ *     summary: Get all bookmarks (protected)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of bookmarks
+ */
+router.get('/', protect, getBookmarks);
+/**
+ * @openapi
+ * /bookmarks/{propertyId}:
+ *   delete:
+ *     summary: Remove bookmark (protected)
+ *     parameters:
+ *       - in: path
+ *         name: propertyId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Bookmark removed
+ */
+router.delete('/:propertyId', protect, bookmarkParamValidator, validate, removeBookmark);
 
 export default router;

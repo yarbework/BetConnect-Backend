@@ -17,36 +17,38 @@ export const register = asyncHandler(async (req, res) => {
             return res.status(400).json({message: 'User already exists'});
         }
 
-        const assignedRole = role === 'agent' ? 'agent' : 'user';
+    const userExists = await User.findOne({ email }); 
+    if (userExists) {
+        return res.status(400).json({ message: 'User already exists' });
+    }
 
-        const assignedStatus = assignedRole === 'agent' ? 'pending' : 'approved';
+    const assignedRole = role === 'agent' ? 'agent' : 'user';
+    const assignedStatus = assignedRole === 'agent' ? 'pending' : 'approved';
 
-        const user = await User.create({
-            name,
-            email,
-            phone,
-            password,
-            role: assignedRole,
-            status: assignedStatus,
-            personalAddress: assignedRole === 'agent' ? personalAddress : undefined,
-        });
-
-        if(user) {
-            res.status(201).json({
-                _id: user._id,
-                name: user.name, 
-                email: user.email,
-                role: user.role,
-                status: user.status,
-                token: generateToken(user._id),
-            });
-        }else {
-            res.status(400).json({
-                message: 'Invalid user data'
-            });
-        }
-
+    const user = await User.create({
+        name,
+        email,
+        phone,
+        password,
+        role: assignedRole,
+        status: assignedStatus,
+        personalAddress: assignedRole === 'agent' ? personalAddress : undefined,
     });
+
+    if (user) {
+        res.status(201).json({
+            _id: user._id,
+            name: user.name, 
+            email: user.email,
+            role: user.role,
+            status: user.status,
+            token: generateToken(user._id),
+            message: "User registered successfully" 
+        });
+    } else {
+        res.status(400).json({ message: 'Invalid user data' });
+    }
+});
 
 export const login = asyncHandler(async (req, res) => {
     const {email, password} = req.body;
@@ -62,6 +64,6 @@ export const login = asyncHandler(async (req, res) => {
                 token: generateToken(user._id),
             });
         }else {
-            res.status(401).json({message: 'Invalid email or Passowrd'});
+            res.status(401).json({message: 'Invalid email or Password'});
         }
     });

@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui --globals",
     "start": "node src/server.js",
     "dev": "npx nodemon -r dotenv/config src/server.js"
   },
@@ -29,11 +32,19 @@
     "groq-sdk": "^1.1.2",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.4.1"
+    "mongoose": "^9.4.1",
+    "nodemailer": "^8.0.5"
   },
   "devDependencies": {
+    "@types/nodemailer": "^8.0.0",
+    "@vitest/coverage-v8": "^4.1.4",
+    "@vitest/ui": "^4.1.4",
     "mongoose": "^9.4.1",
     "multer": "^2.1.1",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "supertest": "^6.3.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "vitest": "^4.1.4"
   }
 }

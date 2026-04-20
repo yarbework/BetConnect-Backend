@@ -1,0 +1,469 @@
+{
+    "info": {
+        "_postman_id": "betconnect-full-collection ",
+        "name": "BetConnect API postman collections",
+        "description": "Complete collection including all missing PUT and DELETE routes synced from the controllers.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+           
+	"name": "Authentication",
+	"description": "Endpoints for identity management, including registration and login for both standard Users and Agents.",
+	"item": [
+		{
+			"name": "Register User/Agent",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Yohannes Desalegn\",\n    \"email\": \"yohannes@example.com\",\n    \"phone\": \"0911223344\",\n    \"password\": \"securePassword123\",\n    \"role\": \"agent\",\n    \"personalAddress\": \"Addis Ababa, Ethiopia\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/auth/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				},
+				"description": "Creates a new account. If the role is 'agent', the account status defaults to 'pending' and requires 'personalAddress'. Standard users are 'approved' by default."
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"yohannes@example.com\",\n    \"password\": \"securePassword123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/auth/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "Authenticates credentials and returns a JWT Bearer token along with user profile details."
+			},
+			"response": []
+		}
+	]
+
+        },
+        {
+			"name": "Properties",
+			"description": "Endpoints managing the property lifecycle: creation, retrieval, updates, and deletion.",
+			"item": [
+				{
+					"name": "Create Property",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": "Requires 'agent' role and 'approved' status."
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"size\": 150,\n    \"type\": \"villa\",\n    \"floor\": 2,\n    \"price\": 45000,\n    \"listingType\": \"rent\",\n    \"subcity\": \"Bole\",\n    \"woreda\": \"05\",\n    \"kebele\": \"10\",\n    \"bedrooms\": 3,\n    \"bathrooms\": 2,\n    \"specialName\": \"Garden View Villa\",\n    \"description\": \"Spacious villa with modern amenities.\",\n    \"images\": [\"https://example.com/image1.jpg\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/properties",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"properties"
+							]
+						},
+						"description": "Creates a new property listing. \n\n**Logic Highlights:**\n- Triggers `generateDescription` service for AI content.\n- Stores the ID of the logged-in agent.\n- Validates required fields like size, type, and location."
+					}
+				},
+				{
+					"name": "Get All Properties (Filtered)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"disabled": true,
+								"description": "Optional. If provided, reveals agent phone numbers."
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/properties?subcity=Bole&minPrice=20000&maxPrice=50000&type=apartment&status=available&page=1&limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"properties"
+							],
+							"query": [
+								{ "key": "subcity", "value": "Bole" },
+								{ "key": "minPrice", "value": "20000" },
+								{ "key": "maxPrice", "value": "50000" },
+								{ "key": "type", "value": "apartment" },
+								{ "key": "listingType", "value": "rent", "disabled": true },
+								{ "key": "minSize", "value": "100", "disabled": true },
+								{ "key": "bedrooms", "value": "2", "disabled": true },
+								{ "key": "status", "value": "available" },
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" }
+							]
+						},
+						"description": "Fetches properties with advanced filtering and pagination. \n\n**Privacy Logic:**\n- If `req.user` is absent (no token), the `agent.phone` field is automatically removed from the results for privacy."
+					}
+				},
+				{
+					"name": "Get Property By ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/properties/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "The MongoDB _id of the property"
+								}
+							]
+						},
+						"description": "Retrieves full details for a single property. Like the list view, the agent's phone number is hidden from unauthenticated guests."
+					}
+				},
+				{
+					"name": "Update Property",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": "Requires 'protect' middleware."
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 48000,\n    \"status\": \"sold\",\n    \"description\": \"Updated description text.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/properties/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Updates property details. \n\n**Security Logic:**\n- Verifies that `property.agent` matches `req.user._id` before allowing the update. Returns 403 if unauthorized."
+					}
+				},
+				{
+					"name": "Delete Property",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/properties/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Permanently removes a property listing. Only the owning agent can perform this action."
+					}
+				}
+			]
+		},
+        {
+	"name": "Bookmarks",
+	"description": "Endpoints for managing a user's personal saved property list. All routes require a valid Bearer token.",
+	"item": [
+		{
+			"name": "Add Bookmark",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/bookmarks/:propertyId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"bookmarks",
+						":propertyId"
+					],
+					"variable": [
+						{
+							"key": "propertyId",
+							"value": "",
+							"description": "The MongoDB _id of the property to save"
+						}
+					]
+				},
+				"description": "Saves a property to the logged-in user's account. Prevents duplicate bookmarks for the same property."
+			},
+			"response": []
+		},
+		{
+			"name": "Get My Bookmarks",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/bookmarks",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"bookmarks"
+					]
+				},
+				"description": "Retrieves the user's saved list. The response is populated with full property details (size, price, location) instead of just IDs."
+			},
+			"response": []
+		},
+		{
+			"name": "Remove Bookmark",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/bookmarks/:propertyId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"bookmarks",
+						":propertyId"
+					],
+					"variable": [
+						{
+							"key": "propertyId",
+							"value": "",
+							"description": "The MongoDB _id of the property to remove"
+						}
+					]
+				},
+				"description": "Removes a specific property from the user's saved list."
+			},
+			"response": []
+		}
+	]
+},
+        {
+			"name": "AI Chat",
+			"description": "Endpoints related to the intelligent property assistant.",
+			"item": [
+				{
+					"name": "RAG Property Search",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": "Required. The route is protected by the 'protect' middleware."
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"message\": \"I am looking for an apartment to rent in Bole under 30,000 ETB\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/ai/chat",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"chat"
+							]
+						},
+						"description": "This endpoint implements a RAG (Retrieval-Augmented Generation) flow.\n\n**Process:**\n1. **Intent Extraction**: Parses the message for keywords like 'rent', 'buy', or 'sale'.\n2. **Entity Recognition**: Scans the message against a list of Addis Ababa subcities (e.g., Bole, CMC, Lebu).\n3. **Database Retrieval**: Queries the Property model for up to 5 matching listings.\n4. **LLM Synthesis**: Sends the user query + database results to Groq (Llama 3-70b) to generate a conversational response."
+					}
+				}
+			]
+		},
+        {
+           
+	"name": "Admin Panel",
+	"description": "Administrative endpoints for managing the platform. Access is restricted to users with the 'admin' role via the isAdmin middleware.",
+	"item": [
+		{
+			"name": "Get Pending Agents",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"description": "Requires 'admin' role token",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/admin/agents/pending",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"agents",
+						"pending"
+					]
+				},
+				"description": "Retrieves a list of all users registered as 'agent' whose status is currently 'pending'. Used by administrators to review new applicants."
+			},
+			"response": []
+		},
+		{
+			"name": "Approve Agent",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"description": "Requires 'admin' role token",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/admin/agents/:id/approve",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"agents",
+						":id",
+						"approve"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "",
+							"description": "The unique MongoDB _id of the agent user"
+						}
+					]
+				},
+				"description": "Updates an agent's status from 'pending' to 'approved'. Upon successful update, the system triggers an automated approval email via the sendApprovalEmail service."
+			},
+			"response": []
+		}
+	]
+}
+        
+    ],
+    "variable": [
+        { "key": "token", "value": "", "type": "string" }
+    ]
+}
