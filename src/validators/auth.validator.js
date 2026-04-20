@@ -18,11 +18,12 @@ export const registerValidator = [
     .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 
   body('role')
-    .optional()
+    .notEmpty().withMessage('Role is required')
     .isIn(['user', 'agent', 'admin']).withMessage('Invalid role'),
 
   body('personalAddress')
-    .optional()
+    .if(body('role').equals('agent'))
+    .notEmpty().withMessage('Personal address is required for agents')
     .isLength({ max: 200 }).withMessage('Address too long')
 ];
 

@@ -1,56 +1,52 @@
-import Groq from 'groq-sdk';
+import Groq from "groq-sdk";
 
-const groqApiKey = process.env.GROQ_API_KEY;
-if (!groqApiKey) {
-    throw new Error('GROQ_API_KEY environment variable is required to initialize Groq client.');
-}
-
-const groq = new Groq({ apiKey: groqApiKey });
+const getGroqClient = () => {
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error("GROQ_API_KEY is missing from environment variables.");
+  }
+  return new Groq({ apiKey: process.env.GROQ_API_KEY });
+};
 
 export const generateDescription = async (propertyData) => {
-    const {type, subcity, woreda, kebele, size, floor, price, specialName} = propertyData;
+  const { type, subcity, woreda, kebele, size, floor, price, specialName } = propertyData;
+  
+  const groq = getGroqClient();
 
-     const prompt = `
+  const prompt = `
     Act as a professional real estate agent in Ethiopia. 
     Write a short, catchy, and professional 3-sentence description for a property listing.
     Details:
-    - Type: ${type} (for ${type === 'sale' ? 'sale' : 'rent'})
+    - Type: ${type} (for ${propertyData.listingType})
     - Location: ${subcity}, Woreda ${woreda}, Kebele ${kebele} (${specialName})
-    - Size: ${size}
+    - Size: ${size} sqm
     - Floor: ${floor}
     - Price: ${price} ETB
-    Make it sound inviting and mention the specific location details.
-  `; 
+    Make it sound inviting and professional.
+  `;
 
   const completion = await groq.chat.completions.create({
     messages: [{ role: "user", content: prompt }],
-    model: "llama3-8b-8192",
+    model: "llama-3.1-8b-instant", 
   });
 
-   return completion.choices[0]?.message?.content || "";
-}
+  return completion.choices[0]?.message?.content || "";
+};
 
+// TASK 2: Smart Chatbot
 export const chatWithData = async (userQuery, propertyList) => {
-    const prompt = `
-    You are the BetConnect AI Assistant. Your job is to help users find homes in Ethiopia.
-    
+  const groq = getGroqClient();
+
+  const prompt = `
+    You are the BetConnect AI Assistant.
     User Question: "${userQuery}"
-    
-    Here are the available properties from our database that match their search:
-    ${JSON.stringify(propertyList)}
-    
-    Instructions:
-    1. If there are matches, summarize them nicely and tell the user why they fit their needs.
-    2. Mention the subcity, price, and floor.
-    3. If there are NO matches, suggest they try searching in a different subcity or budget.
-    4. Keep it conversational but professional.
+    Database Matches: ${JSON.stringify(propertyList)}
+    Summarize these properties for the user and help them choose.
   `;
 
-   const completion = await groq.chat.completions.create({
+  const completion = await groq.chat.completions.create({
     messages: [{ role: "user", content: prompt }],
-    model: "llama3-70b-8192", 
+    model: "llama-3.3-70b-versatile", // UPDATED MODEL ID
   });
 
-   return completion.choices[0]?.message?.content || "I'm sorry, I'm having trouble finding that right now.";
-
-}
+  return completion.choices[0]?.message?.content || "";
+};

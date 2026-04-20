@@ -16,7 +16,7 @@ const propertySchema = new mongoose.Schema({
         required: true
     },
     floor: {
-        type: Number,
+        type: String,
         required: true
     },
     price: {
@@ -43,7 +43,13 @@ const propertySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    specialName: {
+        type: String
+    },
     description: {
+        type: String
+    },
+    aiDescription: {
         type: String
     },
     bedrooms: {
@@ -52,6 +58,7 @@ const propertySchema = new mongoose.Schema({
     bathrooms: {
         type: Number
     },
+    
     status: {
         type: String,
         enum: ['available', 'sold', 'rented'],

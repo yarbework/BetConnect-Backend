@@ -3,13 +3,13 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { generateDescription } from '../services/ai.service.js';
 
 export const createProperty = asyncHandler(async (req, res) => {
+    const imagePaths = req.files ? req.files.map(file => file.path) : [];
     const {
         size,
         type,
         floor,
         price,
         listingType,
-        images,
         subcity,
         woreda,
         kebele,
@@ -37,7 +37,7 @@ export const createProperty = asyncHandler(async (req, res) => {
         floor,
         price,
         listingType,
-        images,
+        images: imagePaths,
         subcity,
         woreda,
         kebele,
@@ -96,18 +96,16 @@ export const getProperties = asyncHandler(async (req, res) => {
     const properties = await Property.find(query)
         .populate('agent', 'name email phone')
         .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(Number(limit));
+        .lean();
 
     const total = await Property.countDocuments(query);
 
     // Hide agent phone if user is not logged in
     const sanitizedProperties = properties.map(property => {
-        const propertyObj = property.toObject();
-        if (!req.user && propertyObj.agent) {
-            delete propertyObj.agent.phone;
+        if (!req.user) {
+            delete property.agent.phone;
         }
-        return propertyObj;
+        return property;
     });
 
     res.json({

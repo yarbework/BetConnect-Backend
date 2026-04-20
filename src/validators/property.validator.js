@@ -12,7 +12,7 @@ export const createPropertyValidator = [
 
   body('floor')
     .notEmpty().withMessage('Floor is required')
-    .isInt({ min: 0 }).withMessage('Floor must be a positive number'),
+    .isString().withMessage('Floor must be a string'),
 
   body('price')
     .notEmpty().withMessage('Price is required')
@@ -63,7 +63,7 @@ export const updatePropertyValidator = [
 
   body('floor')
     .optional()
-    .isInt({ min: 0 }).withMessage('Floor must be a positive number'),
+    .isString().withMessage('Floor must be a string'),
 
   body('price')
     .optional()

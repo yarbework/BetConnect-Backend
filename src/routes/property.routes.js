@@ -12,14 +12,15 @@ import {
     createPropertyValidator,
     updatePropertyValidator
 } from '../validators/property.validator.js';
+import {upload} from '../middleware/upload.js';
 
 const router = express.Router();
 
-router.post('/', protect, approvedAgent, createPropertyValidator, validate, createProperty)
+router.post('/', protect, approvedAgent, upload.array('images', 5), createPropertyValidator, validate, createProperty)
 router.get('/', optionalAuth, getProperties);
 
 router.get('/:id', optionalAuth, getPropertyById);
-router.put('/:id', protect, updatePropertyValidator, validate, updateProperty);
+router.put('/:id', protect, upload.array('images', 5), updatePropertyValidator, validate, updateProperty);
 router.delete('/:id', protect, deleteProperty);
 
 export default router;

@@ -9,7 +9,17 @@ import cors from 'cors';
 
 import aiRoutes from './routes/ai.routes.js';
 
+import fs from 'fs';
+import path from 'path';
+
+
 const app = express();
+
+const uploadDir = './uploads';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+    console.log("📁 Created 'uploads' directory automatically.");
+}
 
 app.use(cors({
   origin: 'http://localhost:5173', 
@@ -30,6 +40,7 @@ app.use('/api/ai', aiRoutes);
 
 // Health check
 
+app.use('/uploads', express.static('uploads'));
 app.use (errorHandler);
 
 app.get('/health', (req, res) => {
