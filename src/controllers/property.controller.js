@@ -116,6 +116,12 @@ export const getProperties = asyncHandler(async (req, res) => {
     });
 });
 
+export const getMyProperties = asyncHandler(async (req, res) => {
+    const properties = await Property.find({ agent: req.user._id })
+        .sort({ createdAt: -1 });
+
+    res.json(properties);
+});
 
 export const getPropertyById = asyncHandler(async (req, res) => {
     const property = await Property.findById(req.params.id).populate('agent', 'name email phone');
