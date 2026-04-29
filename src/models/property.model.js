@@ -58,6 +58,19 @@ const propertySchema = new mongoose.Schema({
     bathrooms: {
         type: Number
     },
+  
+    aiDescription: {
+        type: String
+    },
+    
+    isVerified: {
+        type: Boolean,
+        default: true
+    },
+    aiFlagged: {
+        type: Boolean,
+        default: false
+    },
     
     status: {
         type: String,
