@@ -8,6 +8,7 @@ export const handleChat = async (req, res) => {
 
     const isRent = message.toLowerCase().includes('rent');
     const isSale = message.toLowerCase().includes('buy') || message.toLowerCase().includes('sale');
+
     
     let query = {};
 
@@ -20,11 +21,16 @@ export const handleChat = async (req, res) => {
 
     if (foundSubcity) query.subcity = new RegExp(foundSubcity, 'i');
     
-    const matches = await Property.find(query).limit(5).select('-agentId');
+    const matches = await Property.find(query).limit(3).lean();
 
     const aiResponse = await chatWithData(message, matches);
 
-    res.json({ response: aiResponse });
+    res.json({ 
+      response: aiResponse, 
+      properties: matches
+    });
+
+    
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

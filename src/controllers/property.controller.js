@@ -54,6 +54,7 @@ export const createProperty = asyncHandler(async (req, res) => {
 
 export const getProperties = asyncHandler(async (req, res) => {
     const {
+        keyword,
         minPrice,
         maxPrice,
         listingType,
@@ -71,6 +72,15 @@ export const getProperties = asyncHandler(async (req, res) => {
 
     const query = {};
 
+    if(keyword){
+        query.$or =[
+            { subcity: {$regex: keyword, $options: 'i' } },
+            { kebele: {$regex: keyword, $options: 'i' } },
+            { specialName: { $regex: keyword, $options: 'i' } },
+            { description: { $regex: keyword, $options: 'i' } },
+            { type: { $regex: keyword, $options: 'i'} }
+        ]
+    }
     if (minPrice || maxPrice) {
         query.price = {};
         if (minPrice) query.price.$gte = Number(minPrice);
