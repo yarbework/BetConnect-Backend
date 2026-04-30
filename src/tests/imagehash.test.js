@@ -7,8 +7,8 @@ describe('Boro-Shield Watermarking Logic', () => {
     const coords1 = getSecretCoordinates(secret, 1000);
     const coords2 = getSecretCoordinates(secret, 1000);
     
-    expect(coords1).toEqual(coords2); // Must be deterministic
-    expect(coords1.length).toBe(50); // Should return the defined 50 blocks
+    expect(coords1).toEqual(coords2); 
+    expect(coords1.length).toBe(50); 
   });
 
   it('should maintain pixel integrity through DCT and IDCT', () => {
@@ -26,7 +26,7 @@ describe('Boro-Shield Watermarking Logic', () => {
     const dct = watermarkLogic.performDCT(originalBlock);
     const idct = watermarkLogic.performIDCT(dct);
 
-    // Allowing for small rounding errors in math
+   
     expect(idct[0][0]).toBeGreaterThan(250);
     expect(idct[3][3]).toBeLessThan(40);
   });
