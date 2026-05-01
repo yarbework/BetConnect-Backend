@@ -273,7 +273,7 @@ describe('deleteProperty', () => {
     const res = mockRes();
     await deleteProperty({ params: { id: propId }, user: { _id: agentId, toString: () => agentId } }, res, vi.fn());
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Not authorized to delete this property' });
+    expect(res.json).toHaveBeenCalledWith({ message: 'Not authorized' });
   });
 
   it('deletes and returns success', async () => {

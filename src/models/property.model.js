@@ -59,6 +59,15 @@ const propertySchema = new mongoose.Schema({
         type: Number
     },
     
+    isVerified: {
+        type: Boolean,
+        default: true
+    },
+    aiFlagged: {
+        type: Boolean,
+        default: false
+    },
+    
     status: {
         type: String,
         enum: ['available', 'sold', 'rented'],
