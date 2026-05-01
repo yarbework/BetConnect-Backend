@@ -37,10 +37,16 @@ export const chatWithData = async (userQuery, propertyList) => {
   const groq = getGroqClient();
 
   const prompt = `
-    You are the BetConnect AI Assistant.
+    You are the BetConnect AI. The user is looking for a home.
     User Question: "${userQuery}"
-    Database Matches: ${JSON.stringify(propertyList)}
-    Summarize these properties for the user and help them choose.
+    
+    I have attached ${propertyList.length} real property results from our database below.
+    
+    INSTRUCTIONS:
+    1. Do NOT list the price or features in your text response. 
+    2. Simply acknowledge you found some matches (e.g., "I found 2 great options in Bole for you!").
+    3. Tell the user they can click the cards below for full details and agent contact info.
+    4. Keep your text extremely short (max 2 sentences).
   `;
 
   const completion = await groq.chat.completions.create({
