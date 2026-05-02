@@ -2,74 +2,91 @@ import mongoose from "mongoose";
 
 const propertySchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    price: {
-      type: Number,
-      required: true,
-    },
-    type: {
-      type: String,
-      enum: ["house", "apartment", "land", "commercial"],
-      required: true,
-    },
-<<<<<<< HEAD
-=======
-    bathrooms: {
-        type: Number
-    },
-    
-    isVerified: {
-        type: Boolean,
-        default: true
-    },
-    aiFlagged: {
-        type: Boolean,
-        default: false
-    },
-    
->>>>>>> 13cfce60bcba9ce271b1e82291f36ef43abb7395
-    status: {
-      type: String,
-      enum: ["for_sale", "for_rent", "sold"],
-      default: "for_sale",
-    },
-    images: [{ type: String }],
     agent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    address: {
+    type: {
+      type: String,
+      enum: ["house", "apartment", "villa", "condo", "studio", "commercial", "land"],
+      required: true,
+      lowercase: true,
+    },
+    size: {
+      type: Number, 
+      required: true,
+    },
+    floor: {
+      type: String, 
+      required: true,
+    },
+    bedrooms: {
+      type: Number,
+      default: 0,
+    },
+    bathrooms: {
+      type: Number,
+      default: 0,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    listingType: {
+      type: String,
+      enum: ["rent", "sale"],
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["available", "sold", "rented"],
+      default: "available",
+    },
+    subcity: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    woreda: {
       type: String,
       required: true,
     },
-    // GeoJSON Point — required for $near / $geoWithin queries
+    kebele: {
+      type: String,
+      required: true,
+    },
+    specialName: {
+      type: String, 
+      trim: true,
+    },
+    description: {
+      type: String, 
+    },
+    aiDescription: {
+      type: String, 
+    },
+    images: [{ type: String }],
+    aiFlagged: {
+      type: Boolean,
+      default: false, 
+    },
     location: {
       type: {
         type: String,
         enum: ["Point"],
-        required: true,
         default: "Point",
       },
       coordinates: {
-        // [longitude, latitude]  — MongoDB uses lng first
-        type: [Number],
-        required: true,
+        type: [Number], 
+        index: "2dsphere", 
       },
     },
   },
   { timestamps: true }
 );
 
-// 2dsphere index enables geospatial queries
+// This index allows the "Find Nearby Houses" feature to work
 propertySchema.index({ location: "2dsphere" });
 
-export default mongoose.model("Property", propertySchema);
+export default mongoose.models.Property || mongoose.model("Property", propertySchema);

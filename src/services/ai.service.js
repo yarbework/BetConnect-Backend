@@ -47,6 +47,7 @@ export const chatWithData = async (userQuery, propertyList) => {
     2. Simply acknowledge you found some matches (e.g., "I found 2 great options in Bole for you!").
     3. Tell the user they can click the cards below for full details and agent contact info.
     4. Keep your text extremely short (max 2 sentences).
+    5. If no properties are found in the list I gave you, apologize and suggest they try a different subcity or a higher budget.
   `;
 
   const completion = await groq.chat.completions.create({
